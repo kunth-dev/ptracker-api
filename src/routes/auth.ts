@@ -6,6 +6,7 @@ import type { ApiResponse } from "../types/api";
 import {
   CreateUserSchema,
   ForgotPasswordSchema,
+  LoginSchema,
   ResetPasswordSchema,
   SendResetCodeSchema,
 } from "../types/user";
@@ -38,6 +39,38 @@ router.post(
     } catch (error) {
       if (error instanceof Error && error.message === "User with this email already exists") {
         throw new AppError(error.message, 409);
+      }
+      throw error;
+    }
+  }),
+);
+
+// Login user (POST /api/auth/login)
+router.post(
+  "/login",
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const validationResult = LoginSchema.safeParse(req.body);
+
+    if (!validationResult.success) {
+      const errorMessage = validationResult.error.errors[0]?.message || "Validation failed";
+      throw new AppError(errorMessage, 400);
+    }
+
+    const { email, password } = validationResult.data;
+
+    try {
+      const user = userService.loginUser(email, password);
+
+      const response: ApiResponse = {
+        success: true,
+        data: user,
+        message: "Login successful",
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      if (error instanceof Error && error.message === "Invalid credentials") {
+        throw new AppError(error.message, 401);
       }
       throw error;
     }

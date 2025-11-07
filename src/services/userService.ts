@@ -85,6 +85,24 @@ export function getUserByEmail(email: string): User | null {
 }
 
 /**
+ * Verify user credentials and return user if valid
+ */
+export function loginUser(email: string, password: string): User {
+  // Find user by email (need to check with password)
+  for (const user of users.values()) {
+    if (user.email === email) {
+      const hashedPassword = hashPassword(password);
+      if (user.password === hashedPassword) {
+        const { password: _, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      }
+      throw new Error("Invalid credentials");
+    }
+  }
+  throw new Error("Invalid credentials");
+}
+
+/**
  * Send reset password code
  */
 export function sendResetCode(email: string): { code: string; expiresAt: Date } {

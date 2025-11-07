@@ -33,9 +33,15 @@ export const UpdateUserSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters long").optional(),
 });
 
+export const LoginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
 // Type inference from schemas
 export type CreateUserRequest = z.infer<typeof CreateUserSchema>;
 export type SendResetCodeRequest = z.infer<typeof SendResetCodeSchema>;
 export type ResetPasswordRequest = z.infer<typeof ResetPasswordSchema>;
 export type ForgotPasswordRequest = z.infer<typeof ForgotPasswordSchema>;
 export type UpdateUserRequest = z.infer<typeof UpdateUserSchema>;
+export type LoginRequest = z.infer<typeof LoginSchema>;
