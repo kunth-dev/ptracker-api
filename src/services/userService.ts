@@ -13,14 +13,16 @@ function generateUserId(): string {
 }
 
 /**
- * Generate a random 6-digit reset code
+ * Generate a random 6-digit reset code using crypto.randomInt
  */
 function generateResetCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return crypto.randomInt(100000, 1000000).toString();
 }
 
 /**
- * Hash a password using SHA-256 (for demo purposes - in production use bcrypt)
+ * Hash a password using SHA-256 (for demo purposes - in production use bcrypt, scrypt, or Argon2)
+ * WARNING: SHA-256 is NOT secure for password hashing as it's designed for speed.
+ * It's vulnerable to brute force attacks. This is only for demonstration.
  */
 function hashPassword(password: string): string {
   return crypto.createHash("sha256").update(password).digest("hex");
@@ -99,6 +101,7 @@ export function sendResetCode(email: string): { code: string; expiresAt: Date } 
   resetCodes.set(email, { code, expiresAt });
 
   // In production, this would send an email
+  // WARNING: Logging reset codes is a security vulnerability. Remove in production.
   console.log(`Reset code for ${email}: ${code}`);
 
   return { code, expiresAt };

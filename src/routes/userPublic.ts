@@ -118,6 +118,11 @@ router.post(
 );
 
 // Forgot password (POST /api/user/forgot-password)
+// Note: This endpoint duplicates send-reset-code functionality. In the issue specification,
+// both "send reset password code" and "forgot password" were listed as separate requirements.
+// They both send a reset code to the user's email. In a production system, you might want to
+// consolidate these or differentiate their purposes (e.g., forgot-password could trigger
+// additional security measures, logging, or rate limiting).
 router.post(
   "/forgot-password",
   asyncHandler(async (req: Request, res: Response): Promise<void> => {
