@@ -7,7 +7,7 @@ import crypto from "node:crypto";
  * @param encoding Encoding type for the strings (default: 'utf8')
  * @returns true if strings match, false otherwise
  */
-export function constantTimeCompare(
+export function safeStringCompare(
   str1: string,
   str2: string,
   encoding: BufferEncoding = "utf8",
