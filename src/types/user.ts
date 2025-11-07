@@ -14,7 +14,8 @@ export const CreateUserSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
-export const SendResetCodeSchema = z.object({
+// Email-only schema used for password reset requests and resending codes
+export const EmailOnlySchema = z.object({
   email: z.string().email("Invalid email address"),
 });
 
@@ -22,10 +23,6 @@ export const ResetPasswordSchema = z.object({
   email: z.string().email("Invalid email address"),
   code: z.string().min(6, "Reset code must be at least 6 characters"),
   newPassword: z.string().min(8, "Password must be at least 8 characters long"),
-});
-
-export const ForgotPasswordSchema = z.object({
-  email: z.string().email("Invalid email address"),
 });
 
 export const UpdateUserSchema = z.object({
@@ -40,8 +37,17 @@ export const LoginSchema = z.object({
 
 // Type inference from schemas
 export type CreateUserRequest = z.infer<typeof CreateUserSchema>;
-export type SendResetCodeRequest = z.infer<typeof SendResetCodeSchema>;
+export type EmailOnlyRequest = z.infer<typeof EmailOnlySchema>;
 export type ResetPasswordRequest = z.infer<typeof ResetPasswordSchema>;
-export type ForgotPasswordRequest = z.infer<typeof ForgotPasswordSchema>;
 export type UpdateUserRequest = z.infer<typeof UpdateUserSchema>;
 export type LoginRequest = z.infer<typeof LoginSchema>;
+
+// Deprecated: Use EmailOnlySchema instead
+/** @deprecated Use EmailOnlySchema for both send-reset-code and forgot-password endpoints */
+export const SendResetCodeSchema = EmailOnlySchema;
+/** @deprecated Use EmailOnlySchema for both send-reset-code and forgot-password endpoints */
+export const ForgotPasswordSchema = EmailOnlySchema;
+/** @deprecated Use EmailOnlyRequest type instead */
+export type SendResetCodeRequest = EmailOnlyRequest;
+/** @deprecated Use EmailOnlyRequest type instead */
+export type ForgotPasswordRequest = EmailOnlyRequest;

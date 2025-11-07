@@ -110,7 +110,13 @@ export function loginUser(email: string, password: string): User {
     throw new ServiceError(ErrorCode.INVALID_CREDENTIALS);
   }
 
-  if (matchedUser.password === hashedPassword) {
+  // Use constant-time comparison to prevent timing attacks
+  const storedHashBuffer = Buffer.from(matchedUser.password, "hex");
+  const inputHashBuffer = Buffer.from(hashedPassword, "hex");
+  if (
+    storedHashBuffer.length === inputHashBuffer.length &&
+    crypto.timingSafeEqual(storedHashBuffer, inputHashBuffer)
+  ) {
     const { password: _, ...userWithoutPassword } = matchedUser;
     return userWithoutPassword;
   }
@@ -158,8 +164,13 @@ export function resetPassword(email: string, code: string, newPassword: string):
     throw new ServiceError(ErrorCode.RESET_CODE_NOT_FOUND);
   }
 
-  // Check if code matches
-  if (resetData.code !== code) {
+  // Check if code matches (constant-time comparison)
+  const storedCodeBuffer = Buffer.from(resetData.code, "utf8");
+  const inputCodeBuffer = Buffer.from(code, "utf8");
+  if (
+    storedCodeBuffer.length !== inputCodeBuffer.length ||
+    !crypto.timingSafeEqual(storedCodeBuffer, inputCodeBuffer)
+  ) {
     throw new ServiceError(ErrorCode.INVALID_RESET_CODE);
   }
 
