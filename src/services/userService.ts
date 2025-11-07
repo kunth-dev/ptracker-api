@@ -54,7 +54,7 @@ export async function createUser(email: string, password: string): Promise<User>
     .returning();
 
   if (!newUser) {
-    throw new ServiceError(ErrorCode.USER_NOT_FOUND);
+    throw new ServiceError(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to create user");
   }
 
   // Return user without password
@@ -135,7 +135,7 @@ export async function sendResetCode(email: string): Promise<{ code: string; expi
   await db.insert(resetCodes).values({
     email,
     code,
-    expiresAt,
+    expiresAt: expiresAt.toISOString(),
   });
 
   // In production, this would send an email
@@ -176,7 +176,7 @@ export async function resetPassword(
   }
 
   // Check if code has expired
-  if (new Date() > resetData.expiresAt) {
+  if (new Date() > new Date(resetData.expiresAt)) {
     await db.delete(resetCodes).where(eq(resetCodes.email, email));
     throw new ServiceError(ErrorCode.RESET_CODE_EXPIRED);
   }
@@ -258,7 +258,7 @@ export async function updateUser(
     .returning();
 
   if (!updatedUser) {
-    throw new ServiceError(ErrorCode.USER_NOT_FOUND);
+    throw new ServiceError(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to update user");
   }
 
   const { password: _, ...userWithoutPassword } = updatedUser;

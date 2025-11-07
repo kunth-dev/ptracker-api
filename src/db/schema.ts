@@ -11,5 +11,5 @@ export const users = pgTable("users", {
 export const resetCodes = pgTable("reset_codes", {
   email: text("email").primaryKey(),
   code: text("code").notNull(),
-  expiresAt: timestamp("expires_at", { mode: "date" }).notNull(),
+  expiresAt: timestamp("expires_at", { mode: "string" }).notNull(),
 });
