@@ -19,7 +19,7 @@ Backend API for crypto trading application with user management and authenticati
 
 - Node.js >= 18.0.0
 - npm or yarn
-- PostgreSQL >= 12.0
+- PostgreSQL >= 12.0 (see [Database Setup Guide](./docs/DATABASE.md))
 
 ### Installation
 
@@ -40,40 +40,15 @@ Required environment variables:
 - `NODE_ENV` - Environment (development, production, test)
 - `ALLOWED_DOMAINS` - Comma-separated list of allowed CORS domains
 - `BEARER_TOKENS` - Comma-separated list of valid bearer tokens for authentication
-- `DATABASE_URL` - PostgreSQL connection string (e.g., `postgresql://user:password@localhost:5432/crypton_db`)
+- `DATABASE_URL` - PostgreSQL connection string (see [Database Setup Guide](./docs/DATABASE.md))
 
 ### Database Setup
 
-This application uses PostgreSQL with DrizzleORM. Follow these steps to set up the database:
-
-1. **Install PostgreSQL** (if not already installed)
-   ```bash
-   # macOS
-   brew install postgresql@15
-   brew services start postgresql@15
-   
-   # Ubuntu/Debian
-   sudo apt install postgresql postgresql-contrib
-   ```
-
-2. **Create the database**
-   ```bash
-   psql -U postgres
-   CREATE DATABASE crypton_db;
-   \q
-   ```
-
-3. **Configure DATABASE_URL** in your `.env` file
-   ```env
-   DATABASE_URL=postgresql://postgres:postgres@localhost:5432/crypton_db
-   ```
-
-4. **Push database schema**
-   ```bash
-   npm run db:push
-   ```
-
-For detailed database documentation, see [docs/DATABASE.md](./docs/DATABASE.md).
+See the comprehensive [Database Setup Guide](./docs/DATABASE.md) for:
+- PostgreSQL installation and configuration
+- Database creation and schema setup
+- Migration management
+- DrizzleORM usage examples
 
 ### Running the Application
 
