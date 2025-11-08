@@ -1,3 +1,4 @@
+import path from "node:path";
 import winston from "winston";
 import { env } from "./env.js";
 
@@ -38,6 +39,17 @@ const logger = winston.createLogger({
     // Console transport
     new winston.transports.Console({
       format: env.NODE_ENV === "production" ? logFormat : consoleFormat,
+    }),
+    // File transport for all logs
+    new winston.transports.File({
+      filename: path.join("logs", "combined.log"),
+      format: logFormat,
+    }),
+    // File transport for errors only
+    new winston.transports.File({
+      filename: path.join("logs", "error.log"),
+      level: "error",
+      format: logFormat,
     }),
   ],
 });
