@@ -43,8 +43,20 @@ The easiest way to get started is using Docker Compose, which will set up both t
    ```
 
 4. **Push database schema**
+   
+   The easiest way is to run this from your host machine (you'll need Node.js installed):
    ```bash
-   docker compose exec backend npm run db:push
+   # Install drizzle-kit if not already installed
+   npm install -g drizzle-kit
+   
+   # Push the schema to the database
+   npm run db:push
+   ```
+   
+   Alternatively, you can connect to the PostgreSQL container directly and run SQL commands:
+   ```bash
+   docker compose exec postgres psql -U postgres -d crypton_db
+   # Then run your SQL schema commands
    ```
 
 5. **Access the application**
