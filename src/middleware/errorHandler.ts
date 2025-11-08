@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
+import logger from "../config/logger.js";
 import type { ApiResponse } from "../types/api.js";
 
 export class AppError extends Error {
@@ -35,8 +36,7 @@ export const errorHandler = (
   }
 
   // Log error details
-  console.error(`[${new Date().toISOString()}] Error ${statusCode}:`, {
-    message: error.message,
+  logger.error(`Error ${statusCode}: ${error.message}`, {
     errorCode,
     stack: error.stack,
     url: req.url,

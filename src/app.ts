@@ -5,6 +5,7 @@ import { getAllowedDomains } from "./config/env";
 import { bearerAuth } from "./middleware/bearerAuth";
 import { domainWhitelist } from "./middleware/domainWhitelist";
 import { errorHandler } from "./middleware/errorHandler";
+import { requestLogger } from "./middleware/requestLogger";
 
 import privateRoutes from "./routes/private";
 // Route imports
@@ -45,6 +46,9 @@ app.use(
 // Body parsing middleware
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// Request/Response logging middleware
+app.use(requestLogger);
 
 // Domain whitelist middleware
 app.use(domainWhitelist);

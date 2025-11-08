@@ -5,6 +5,8 @@ dist/
 .env.local
 !.env.example
 *.log
+logs/
+!logs/.gitkeep
 *.tgz
 *.tar.gz
 .DS_Store
