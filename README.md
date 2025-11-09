@@ -39,7 +39,7 @@ The easiest way to get started is using Docker Compose, which will set up both t
 
 3. **Start all services**
    ```bash
-   docker compose up -d
+   docker-compose up -d
    ```
 
 4. **Push database schema**
@@ -55,7 +55,7 @@ The easiest way to get started is using Docker Compose, which will set up both t
    
    Alternatively, you can connect to the PostgreSQL container directly and run SQL commands:
    ```bash
-   docker compose exec postgres psql -U postgres -d crypton_db
+   docker-compose exec postgres psql -U postgres -d crypton_db
    # Then run your SQL schema commands
    ```
 
@@ -67,31 +67,31 @@ The easiest way to get started is using Docker Compose, which will set up both t
 
 ```bash
 # Start services
-docker compose up -d
+docker-compose up -d
 
 # View logs
-docker compose logs -f
+docker-compose logs -f
 
 # View backend logs only
-docker compose logs -f backend
+docker-compose logs -f backend
 
 # Stop services
-docker compose down
+docker-compose down
 
 # Stop services and remove volumes (deletes database data)
-docker compose down -v
+docker-compose down -v
 
 # Rebuild after code changes
-docker compose up -d --build
+docker-compose up -d --build
 
 # Run database migrations
-docker compose exec backend npm run db:push
+docker-compose exec backend npm run db:push
 
 # Access database shell
-docker compose exec postgres psql -U postgres -d crypton_db
+docker-compose exec postgres psql -U postgres -d crypton_db
 
 # Access backend shell
-docker compose exec backend sh
+docker-compose exec backend sh
 ```
 
 ### Manual Installation
