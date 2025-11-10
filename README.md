@@ -52,16 +52,14 @@ The easiest way to get started is using Docker Compose, which will set up both t
    # Push the schema to the database
    npm run db:push
    ```
-   
-   Alternatively, you can connect to the PostgreSQL container directly and run SQL commands:
-   ```bash
-   docker-compose exec postgres psql -U postgres -d price_tracker_db
-   # Then run your SQL schema commands
-   ```
+
+5. Run Drizzle Studio
+   ``yarn drizzle-kit studio``
 
 5. **Access the application**
    - API: http://localhost:3002/api
    - PostgreSQL: localhost:5432 (credentials: postgres/postgres)
+   - Drizzle Studio: https://local.drizzle.studio/
 
 #### Docker Commands
 
