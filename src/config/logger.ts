@@ -34,7 +34,7 @@ const consoleFormat = winston.format.combine(
 const logger = winston.createLogger({
   level: env.NODE_ENV === "production" ? "info" : "debug",
   format: logFormat,
-  defaultMeta: { service: "crypton-backend" },
+  defaultMeta: { service: "price-tracker-api" },
   transports: [
     // Console transport
     new winston.transports.Console({

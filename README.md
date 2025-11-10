@@ -1,4 +1,4 @@
-# Crypton Backend
+# Price Tracker API
 
 Backend API for crypto trading application with user management and authentication.
 
@@ -28,7 +28,7 @@ The easiest way to get started is using Docker Compose, which will set up both t
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd backend-api
+   cd priceTracker-api
    ```
 
 2. **Set up environment variables (optional)**
@@ -55,7 +55,7 @@ The easiest way to get started is using Docker Compose, which will set up both t
    
    Alternatively, you can connect to the PostgreSQL container directly and run SQL commands:
    ```bash
-   docker-compose exec postgres psql -U postgres -d crypton_db
+   docker-compose exec postgres psql -U postgres -d price_tracker_db
    # Then run your SQL schema commands
    ```
 
@@ -88,7 +88,7 @@ docker-compose up -d --build
 docker-compose exec backend npm run db:push
 
 # Access database shell
-docker-compose exec postgres psql -U postgres -d crypton_db
+docker-compose exec postgres psql -U postgres -d price_tracker_db
 
 # Access backend shell
 docker-compose exec backend sh

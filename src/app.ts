@@ -20,23 +20,28 @@ app.use(helmet());
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) {
-        // Allow requests with no origin (e.g., mobile apps, Postman)
+      if (!origin || origin.trim() === "") {
+        // Allow requests with no origin (e.g., mobile apps, Postman, Bruno)
         callback(null, true);
         return;
       }
 
-      const allowedDomains = getAllowedDomains();
-      const hostname = new URL(origin).hostname;
+      try {
+        const allowedDomains = getAllowedDomains();
+        const hostname = new URL(origin).hostname;
 
-      const isAllowed = allowedDomains.some(
-        (domain) => hostname === domain || hostname.endsWith(`.${domain}`),
-      );
+        const isAllowed = allowedDomains.some(
+          (domain) => hostname === domain || hostname.endsWith(`.${domain}`),
+        );
 
-      if (isAllowed) {
+        if (isAllowed) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      } catch (_error) {
+        // If URL parsing fails (e.g., non-standard origin from API clients), allow it
         callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,

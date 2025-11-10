@@ -42,7 +42,7 @@ Download and install from [PostgreSQL official website](https://www.postgresql.o
 psql -U postgres
 
 # Create database
-CREATE DATABASE crypton_db;
+CREATE DATABASE price_tracker_db;
 
 # Exit psql
 \q
@@ -62,7 +62,7 @@ Update the `DATABASE_URL` in your `.env` file:
 DATABASE_URL=postgresql://username:password@host:port/database
 
 # Example:
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/crypton_db
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/price_tracker_db
 ```
 
 **URL Format:**
@@ -70,7 +70,7 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/crypton_db
 - `password`: Your PostgreSQL password
 - `host`: Database host (default: `localhost`)
 - `port`: Database port (default: `5432`)
-- `database`: Database name (e.g., `crypton_db`)
+- `database`: Database name (e.g., `price_tracker_db`)
 
 ### 4. Run Migrations
 
@@ -311,7 +311,7 @@ This application previously used in-memory Map for storage. The migration to Pos
 - Check `pg_hba.conf` authentication settings
 
 **Error: "database does not exist"**
-- Create the database: `CREATE DATABASE crypton_db;`
+- Create the database: `CREATE DATABASE price_tracker_db;`
 
 **Error: "could not connect to server"**
 - Ensure PostgreSQL is running: `sudo systemctl status postgresql`
@@ -327,17 +327,17 @@ This application previously used in-memory Map for storage. The migration to Pos
 
 ### Development
 ```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/crypton_db
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/price_tracker_db
 ```
 
 ### Testing
 ```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/crypton_test_db
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/price_tracker_test_db
 ```
 
 ### Production
 ```env
-DATABASE_URL=postgresql://user:password@prod-host:5432/crypton_db?sslmode=require
+DATABASE_URL=postgresql://user:password@prod-host:5432/price_tracker_db?sslmode=require
 ```
 
 ## Additional Resources

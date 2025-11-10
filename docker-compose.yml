@@ -2,10 +2,10 @@ services:
   # PostgreSQL Database Service
   postgres:
     image: postgres:15-alpine
-    container_name: crypton-postgres
+    container_name: price-tracker-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: crypton_db
+      POSTGRES_DB: price_tracker_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -23,18 +23,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: crypton-backend
+    container_name: price-tracker-api
     restart: unless-stopped
     ports:
       - "3002:3002"
-    environment:
-      PORT: 3002
-      NODE_ENV: production
-      ALLOWED_DOMAINS: localhost,127.0.0.1
-      TRUST_PROXY: "true"
-      LOG_SECURITY_EVENTS: "true"
-      BEARER_TOKENS: ${BEARER_TOKENS:-your_secret_bearer_token_here}
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/crypton_db
+    env_file:
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
