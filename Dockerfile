@@ -25,6 +25,11 @@ RUN npm config set strict-ssl false && \
 COPY --chown=nodejs:nodejs tsconfig.json ./
 COPY --chown=nodejs:nodejs src ./src
 COPY --chown=nodejs:nodejs drizzle.config.ts ./
+COPY --chown=nodejs:nodejs drizzle ./drizzle
+COPY --chown=nodejs:nodejs start.sh ./start.sh
+
+# Make start script executable
+RUN chmod +x start.sh
 
 # Create logs directory with proper permissions
 RUN mkdir -p logs && chown -R nodejs:nodejs logs
@@ -39,5 +44,5 @@ EXPOSE 3002
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3002/api', (r) => {process.exit(r.statusCode === 404 || r.statusCode === 401 ? 0 : 1)})"
 
-# Start application using tsx to run TypeScript directly
-CMD ["npx", "tsx", "src/server.ts"]
+# Start application with migrations
+CMD ["./start.sh"]

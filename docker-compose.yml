@@ -29,6 +29,8 @@ services:
       - "3002:3002"
     env_file:
       - .env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/price_tracker_db
     depends_on:
       postgres:
         condition: service_healthy
