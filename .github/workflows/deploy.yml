@@ -6,7 +6,7 @@ on:
       branch:
         description: 'Branch to deploy'
         required: true
-        default: 'main'
+        default: 'master'
         type: string
 
 jobs:
@@ -38,10 +38,11 @@ jobs:
           host: ${{ secrets.SERVER_SSH_HOST }}
           username: ${{ secrets.SERVER_SSH_LOGIN }}
           password: ${{ secrets.SERVER_SSH_PASSWORD }}
-          source: "Dockerfile,docker-compose.yml,start.sh,package.json,package-lock.json,tsconfig.json,drizzle.config.ts,src,drizzle"
+          source: "."
           target: /var/www/pricetracker-api
           strip_components: 0
           overwrite: true
+          rm: true
       
       - name: Create .env file on remote server
         uses: appleboy/ssh-action@v1.0.3
