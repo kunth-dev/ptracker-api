@@ -47,29 +47,27 @@ services:
     volumes:
       - ./logs:/app/logs
 
-  # Drizzle Studio - Database Management UI
-  drizzle-studio:
-    image: node:20-alpine
-    container_name: price-tracker-drizzle-studio
+  # Drizzle Gateway - Database Management UI
+  drizzle-gateway:
+    image: ghcr.io/drizzle-team/gateway:latest
+    container_name: price-tracker-drizzle-gateway
     restart: unless-stopped
-    working_dir: /app
     ports:
       - "4983:4983"
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres_user}:${POSTGRES_PASSWORD:-postgres_password}@postgres:5432/${POSTGRES_DB:-price_tracker_db}
+      PORT: 4983
+      STORE_PATH: /app/data
+      MASTERPASS: ${DRIZZLE_GATEWAY_MASTERPASS:-changeme_secure_password}
+      DATABASE_URL_default: postgresql://${POSTGRES_USER:-postgres_user}:${POSTGRES_PASSWORD:-postgres_password}@postgres:5432/${POSTGRES_DB:-price_tracker_db}
     volumes:
-      - ./drizzle.config.ts:/app/drizzle.config.ts
-      - ./src/db/schema.ts:/app/src/db/schema.ts
-      - ./package.json:/app/package.json
-      - ./tsconfig.json:/app/tsconfig.json
-    command: sh -c "npm install drizzle-kit drizzle-orm typescript tsx && npx drizzle-kit studio --host 0.0.0.0 --port 4983 --verbose"
+      - drizzle_gateway_data:/app/data
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - pricetracker-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4983"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:4983/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -77,6 +75,8 @@ services:
 
 volumes:
   postgres_data:
+    driver: local
+  drizzle_gateway_data:
     driver: local
 
 networks:

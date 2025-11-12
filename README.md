@@ -57,9 +57,9 @@ The easiest way to get started is using Docker Compose, which will set up both t
    ``yarn drizzle-kit studio``
 
 5. **Access the application**
-   - API: http://localhost:3002/api
+   - API: <http://localhost:3002/api>
    - PostgreSQL: localhost:5432 (credentials: postgres/postgres)
-   - Drizzle Studio: https://local.drizzle.studio/
+   - Drizzle Gateway: <http://localhost:4983>
 
 #### Docker Commands
 
@@ -122,10 +122,9 @@ Required environment variables:
 - `ALLOWED_DOMAINS` - Comma-separated list of allowed CORS domains
 - `BEARER_TOKENS` - Comma-separated list of valid bearer tokens for authentication
 - `DATABASE_URL` - PostgreSQL connection string (see [Database Setup Guide](./docs/DATABASE.md))
+- `DRIZZLE_GATEWAY_MASTERPASS` - Master password for Drizzle Gateway (default: changeme_secure_password)
 
 ### Database Setup
-
-Drizzle Studio: https://local.drizzle.studio/
 
 See the comprehensive [Database Setup Guide](./docs/DATABASE.md) for:
 - PostgreSQL installation and configuration

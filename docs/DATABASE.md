@@ -225,15 +225,80 @@ npm run db:push
 npm run db:studio
 ```
 
-## Drizzle Studio
+## Drizzle Gateway
 
-Drizzle Studio is a visual database browser and editor. To launch it:
+Drizzle Gateway is an advanced self-hosted database management UI. It provides a powerful web interface for database management with enhanced features beyond traditional Drizzle Studio.
+
+### Features
+
+- **Full Schema Management**: Create, alter, and drop schemas, tables, views, and enums
+- **Data Browser**: View and edit data with intuitive interface
+- **Query Editor**: Execute SQL queries with syntax highlighting
+- **Role Management**: Manage PostgreSQL roles, privileges, and policies
+- **Dark Theme**: Modern UI with dark mode support
+- **Health Monitoring**: Built-in health check endpoint
+
+### Accessing Drizzle Gateway
+
+When running via Docker Compose, Drizzle Gateway is accessible at:
+
+```text
+http://localhost:4983
+```
+
+**Default Credentials:**
+
+- Master Password: Set via `DRIZZLE_GATEWAY_MASTERPASS` environment variable
+
+### Gateway Configuration
+
+The Drizzle Gateway is configured in `docker-compose.yml`:
+
+```yaml
+drizzle-gateway:
+  image: ghcr.io/drizzle-team/gateway:latest
+  ports:
+    - "4983:4983"
+  environment:
+    PORT: 4983
+    STORE_PATH: /app/data
+    MASTERPASS: ${DRIZZLE_GATEWAY_MASTERPASS:-changeme_secure_password}
+    DATABASE_URL_default: postgresql://...
+```
+
+**Environment Variables:**
+
+- `DRIZZLE_GATEWAY_MASTERPASS`: Master password for accessing the gateway (set in `.env`)
+- `PORT`: Port for the web interface (default: 4983)
+- `STORE_PATH`: Path for storing gateway configuration
+- `DATABASE_URL_default`: Initial database connection (auto-configured from PostgreSQL service)
+
+### Security Notes
+
+⚠️ **Important**: Change the default master password in production!
+
+Generate a secure password:
+
+```bash
+openssl rand -base64 32
+```
+
+Add it to your `.env` file:
+
+```env
+DRIZZLE_GATEWAY_MASTERPASS=your_secure_password_here
+```
+
+### Alternative: Drizzle Studio CLI
+
+For local development without Docker, you can still use the traditional Drizzle Studio:
 
 ```bash
 npm run db:studio
 ```
 
 This will open a web interface (typically at `https://local.drizzle.studio`) where you can:
+
 - View and edit data
 - Explore schema
 - Run queries
