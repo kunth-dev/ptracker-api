@@ -125,6 +125,8 @@ Required environment variables:
 
 ### Database Setup
 
+Drizzle Studio: https://local.drizzle.studio/
+
 See the comprehensive [Database Setup Guide](./docs/DATABASE.md) for:
 - PostgreSQL installation and configuration
 - Database creation and schema setup

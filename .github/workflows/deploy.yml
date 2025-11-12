@@ -16,6 +16,7 @@ jobs:
           SERVER_SSH_LOGIN: ${{ secrets.SERVER_SSH_LOGIN }}
           SERVER_SSH_PASSWORD: ${{ secrets.SERVER_SSH_PASSWORD }}
           BEARER_TOKENS: ${{ secrets.BEARER_TOKENS }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         run: |
           error_found=false
           
@@ -36,6 +37,11 @@ jobs:
           
           if [ -z "$BEARER_TOKENS" ]; then
             echo "::error::SECRET 'BEARER_TOKENS' is not configured. Please add it in Settings > Secrets and variables > Actions > Secrets"
+            error_found=true
+          fi
+          
+          if [ -z "$POSTGRES_PASSWORD" ]; then
+            echo "::error::SECRET 'POSTGRES_PASSWORD' is not configured. Please add it in Settings > Secrets and variables > Actions > Secrets"
             error_found=true
           fi
           
@@ -107,6 +113,9 @@ jobs:
             BEARER_TOKENS=${{ secrets.BEARER_TOKENS }}
             LOG_SECURITY_EVENTS=${{ vars.LOG_SECURITY_EVENTS || 'true' }}
             TRUST_PROXY=${{ vars.TRUST_PROXY || 'true' }}
+            POSTGRES_DB=${{ vars.POSTGRES_DB || 'price_tracker_db' }}
+            POSTGRES_USER=${{ vars.POSTGRES_USER || 'postgres_user' }}
+            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
             EOF
       
       - name: Deploy with Docker Compose
