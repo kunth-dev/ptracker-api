@@ -13,7 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - pricetracker-network
+      - ptracker-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres_user}"]
       interval: 10s
@@ -37,7 +37,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - pricetracker-network
+      - ptracker-network
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3002/api', (r) => {process.exit(r.statusCode === 404 || r.statusCode === 401 ? 0 : 1)})"]
       interval: 30s
@@ -65,7 +65,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - pricetracker-network
+      - ptracker-network
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:4983/health || exit 1"]
       interval: 30s
@@ -80,5 +80,5 @@ volumes:
     driver: local
 
 networks:
-  pricetracker-network:
+  ptracker-network:
     driver: bridge

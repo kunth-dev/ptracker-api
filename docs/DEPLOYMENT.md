@@ -48,7 +48,7 @@ The deployment workflow performs the following steps:
 
 1. **Checkout Code**: Checks out the selected branch
 2. **Create Directories**: Creates necessary directories on the remote server
-3. **Copy Files**: Transfers application files to `/var/www/pricetracker-api`
+3. **Copy Files**: Transfers application files to `/var/www/ptracker-api`
 4. **Create Environment File**: Generates `.env` file with configuration from GitHub secrets/variables
 5. **Deploy with Docker**: Builds and starts Docker containers using `docker-compose.yml`
 6. **Verify Deployment**: Checks container status and logs
@@ -60,7 +60,7 @@ The deployment workflow performs the following steps:
 After deployment, the following structure is created on the remote server:
 
 ```
-/var/www/pricetracker-api/
+/var/www/ptracker-api/
 ├── .env                          # Environment variables (generated)
 ├── Dockerfile                    # Docker build configuration
 ├── docker-compose.yml            # Docker Compose config
@@ -113,7 +113,7 @@ After deployment, verify the services are running:
 ssh user@khdev.ru
 
 # Check container status
-cd /var/www/pricetracker-api
+cd /var/www/ptracker-api
 docker-compose ps
 
 # View logs
@@ -241,19 +241,19 @@ sudo certbot renew --dry-run
 
 ### Check Container Logs
 ```bash
-cd /var/www/pricetracker-api
+cd /var/www/ptracker-api
 docker-compose logs -f
 ```
 
 ### Restart Services
 ```bash
-cd /var/www/pricetracker-api
+cd /var/www/ptracker-api
 docker-compose restart
 ```
 
 ### Rebuild Containers
 ```bash
-cd /var/www/pricetracker-api
+cd /var/www/ptracker-api
 docker-compose up -d --build
 ```
 
@@ -289,7 +289,7 @@ To rollback to a previous version:
 1. Run the deployment workflow with the previous branch/commit
 2. Or manually on the server:
    ```bash
-   cd /var/www/pricetracker-api
+   cd /var/www/ptracker-api
    git checkout <previous-commit>
    docker-compose up -d --build
    ```

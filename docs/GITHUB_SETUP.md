@@ -108,8 +108,8 @@ sudo certbot --nginx -d api.khdev.ru -d studio.khdev.ru
 
 ### 5. Create Deployment Directory
 ```bash
-sudo mkdir -p /var/www/pricetracker-api
-sudo chown $USER:$USER /var/www/pricetracker-api
+sudo mkdir -p /var/www/ptracker-api
+sudo chown $USER:$USER /var/www/ptracker-api
 ```
 
 ## Running the Deployment
@@ -140,7 +140,7 @@ curl https://studio.khdev.ru
 ### Check Container Status
 ```bash
 ssh user@khdev.ru
-cd /var/www/pricetracker-api
+cd /var/www/ptracker-api
 docker-compose ps
 ```
 

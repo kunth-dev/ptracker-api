@@ -89,8 +89,8 @@ jobs:
           username: ${{ secrets.SERVER_SSH_LOGIN }}
           password: ${{ secrets.SERVER_SSH_PASSWORD }}
           script: |
-            mkdir -p /var/www/pricetracker-api
-            mkdir -p /var/www/pricetracker-api/logs
+            mkdir -p /var/www/ptracker-api
+            mkdir -p /var/www/ptracker-api/logs
       
       - name: Copy files to remote server
         uses: appleboy/scp-action@v0.1.7
@@ -99,7 +99,7 @@ jobs:
           username: ${{ secrets.SERVER_SSH_LOGIN }}
           password: ${{ secrets.SERVER_SSH_PASSWORD }}
           source: "."
-          target: /var/www/pricetracker-api
+          target: /var/www/ptracker-api
           strip_components: 0
           overwrite: true
           rm: true
@@ -111,7 +111,7 @@ jobs:
           username: ${{ secrets.SERVER_SSH_LOGIN }}
           password: ${{ secrets.SERVER_SSH_PASSWORD }}
           script: |
-            cd /var/www/pricetracker-api
+            cd /var/www/ptracker-api
             cat > .env << EOF
             PORT=${{ vars.PORT || '3002' }}
             NODE_ENV=${{ vars.NODE_ENV || 'production' }}
@@ -132,7 +132,7 @@ jobs:
           username: ${{ secrets.SERVER_SSH_LOGIN }}
           password: ${{ secrets.SERVER_SSH_PASSWORD }}
           script: |
-            cd /var/www/pricetracker-api
+            cd /var/www/ptracker-api
             docker-compose down
             docker-compose up -d --build
             docker-compose ps
@@ -144,7 +144,7 @@ jobs:
           username: ${{ secrets.SERVER_SSH_LOGIN }}
           password: ${{ secrets.SERVER_SSH_PASSWORD }}
           script: |
-            cd /var/www/pricetracker-api
+            cd /var/www/ptracker-api
             echo "Checking container status..."
             docker-compose ps
             

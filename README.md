@@ -28,7 +28,7 @@ The easiest way to get started is using Docker Compose, which will set up both t
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd priceTracker-api
+   cd ptracker-api
    ```
 
 2. **Set up environment variables (optional)**
