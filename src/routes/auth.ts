@@ -7,8 +7,10 @@ import {
   CreateUserSchema,
   ForgotPasswordSchema,
   LoginSchema,
+  ResendVerificationCodeSchema,
   ResetPasswordSchema,
   SendResetCodeSchema,
+  VerifyEmailSchema,
 } from "../types/user";
 import { handleServiceError } from "../utils/errorHandler";
 import { validateRequest } from "../utils/validation";
@@ -60,6 +62,8 @@ router.post(
 );
 
 // Send reset password code (POST /api/auth/send-reset-code)
+// NOTE: Rate limiting should be implemented in production (e.g., max 3 requests per hour per email)
+// to prevent abuse of code generation
 router.post(
   "/send-reset-code",
   asyncHandler(async (req: Request, res: Response): Promise<void> => {
@@ -124,6 +128,52 @@ router.post(
         data: {
           expiresAt: expiresAt.toISOString(),
         },
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      handleServiceError(error);
+    }
+  }),
+);
+
+// Verify email with OTP code (POST /api/auth/verify-email)
+// NOTE: Rate limiting should be implemented in production (e.g., max 5 attempts per 15 minutes per email)
+// to prevent brute force attacks on verification codes
+router.post(
+  "/verify-email",
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { email, code } = validateRequest(VerifyEmailSchema, req.body);
+
+    try {
+      await userService.verifyEmail(email, code);
+
+      const response: ApiResponse = {
+        success: true,
+        message: "Email verified successfully",
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      handleServiceError(error);
+    }
+  }),
+);
+
+// Resend email verification code (POST /api/auth/resend-verification-code)
+// NOTE: Rate limiting should be implemented in production (e.g., max 3 requests per hour per email)
+// to prevent abuse of code generation
+router.post(
+  "/resend-verification-code",
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { email } = validateRequest(ResendVerificationCodeSchema, req.body);
+
+    try {
+      await userService.sendVerificationCode(email);
+
+      const response: ApiResponse = {
+        success: true,
+        message: "Verification code sent successfully",
       };
 
       res.status(200).json(response);

@@ -14,6 +14,12 @@ export const resetCodes = pgTable("reset_codes", {
   expiresAt: timestamp("expires_at", { mode: "string" }).notNull(),
 });
 
+export const verificationCodes = pgTable("verification_codes", {
+  email: text("email").primaryKey(),
+  code: text("code").notNull(),
+  expiresAt: timestamp("expires_at", { mode: "string" }).notNull(),
+});
+
 export const orders = pgTable("orders", {
   orderId: uuid("order_id").primaryKey().defaultRandom(),
   title: text("title").notNull(),

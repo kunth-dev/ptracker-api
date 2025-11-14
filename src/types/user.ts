@@ -35,12 +35,26 @@ export const LoginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
+export const VerifyEmailSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  code: z
+    .string()
+    .length(6, "Code must be exactly 6 digits")
+    .regex(/^\d{6}$/, "Code must be exactly 6 digits"),
+});
+
+export const ResendVerificationCodeSchema = z.object({
+  email: z.string().email("Invalid email address"),
+});
+
 // Type inference from schemas
 export type CreateUserRequest = z.infer<typeof CreateUserSchema>;
 export type EmailOnlyRequest = z.infer<typeof EmailOnlySchema>;
 export type ResetPasswordRequest = z.infer<typeof ResetPasswordSchema>;
 export type UpdateUserRequest = z.infer<typeof UpdateUserSchema>;
 export type LoginRequest = z.infer<typeof LoginSchema>;
+export type VerifyEmailRequest = z.infer<typeof VerifyEmailSchema>;
+export type ResendVerificationCodeRequest = z.infer<typeof ResendVerificationCodeSchema>;
 
 // Deprecated: Use EmailOnlySchema instead
 /** @deprecated Use EmailOnlySchema for both send-reset-code and forgot-password endpoints */
