@@ -62,6 +62,8 @@ router.post(
 );
 
 // Send reset password code (POST /api/auth/send-reset-code)
+// NOTE: Rate limiting should be implemented in production (e.g., max 3 requests per hour per email)
+// to prevent abuse of code generation
 router.post(
   "/send-reset-code",
   asyncHandler(async (req: Request, res: Response): Promise<void> => {
@@ -136,6 +138,8 @@ router.post(
 );
 
 // Verify email with OTP code (POST /api/auth/verify-email)
+// NOTE: Rate limiting should be implemented in production (e.g., max 5 attempts per 15 minutes per email)
+// to prevent brute force attacks on verification codes
 router.post(
   "/verify-email",
   asyncHandler(async (req: Request, res: Response): Promise<void> => {
@@ -157,6 +161,8 @@ router.post(
 );
 
 // Resend email verification code (POST /api/auth/resend-verification-code)
+// NOTE: Rate limiting should be implemented in production (e.g., max 3 requests per hour per email)
+// to prevent abuse of code generation
 router.post(
   "/resend-verification-code",
   asyncHandler(async (req: Request, res: Response): Promise<void> => {
