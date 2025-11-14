@@ -24,6 +24,13 @@ export enum ErrorCode {
   INVALID_RESET_CODE = "INVALID_RESET_CODE",
   RESET_CODE_EXPIRED = "RESET_CODE_EXPIRED",
 
+  // Email verification errors (4xxx)
+  VERIFICATION_CODE_NOT_FOUND = "VERIFICATION_CODE_NOT_FOUND",
+  INVALID_VERIFICATION_CODE = "INVALID_VERIFICATION_CODE",
+  VERIFICATION_CODE_EXPIRED = "VERIFICATION_CODE_EXPIRED",
+  EMAIL_ALREADY_VERIFIED = "EMAIL_ALREADY_VERIFIED",
+  INVALID_CODE_FORMAT = "INVALID_CODE_FORMAT",
+
   // Order errors (5xxx)
   ORDER_NOT_FOUND = "ORDER_NOT_FOUND",
 
@@ -52,6 +59,12 @@ export const ErrorMessages: Record<ErrorCode, string> = {
   [ErrorCode.RESET_CODE_NOT_FOUND]: "No reset code found for this email",
   [ErrorCode.INVALID_RESET_CODE]: "Invalid reset code",
   [ErrorCode.RESET_CODE_EXPIRED]: "Reset code has expired",
+
+  [ErrorCode.VERIFICATION_CODE_NOT_FOUND]: "No verification code found for this email",
+  [ErrorCode.INVALID_VERIFICATION_CODE]: "Invalid verification code",
+  [ErrorCode.VERIFICATION_CODE_EXPIRED]: "Verification code has expired",
+  [ErrorCode.EMAIL_ALREADY_VERIFIED]: "Email is already verified",
+  [ErrorCode.INVALID_CODE_FORMAT]: "Invalid code format",
 
   [ErrorCode.ORDER_NOT_FOUND]: "Order not found",
 

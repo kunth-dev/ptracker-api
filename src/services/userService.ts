@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import { eq } from "drizzle-orm";
 import { db } from "../config/database";
 import { ErrorCode, ErrorMessages } from "../constants/errorCodes";
-import { resetCodes, users } from "../db/schema";
+import { resetCodes, users, verificationCodes } from "../db/schema";
 import type { User } from "../types/user";
 import { safeStringCompare } from "../utils/crypto";
 
@@ -263,4 +263,86 @@ export async function updateUser(
 
   const { password: _, ...userWithoutPassword } = updatedUser;
   return userWithoutPassword;
+}
+
+/**
+ * Send verification code to email
+ * NOTE: In production, implement rate limiting (e.g., max 3 requests per hour per email)
+ */
+export async function sendVerificationCode(
+  email: string,
+): Promise<{ code: string; expiresAt: Date }> {
+  // Check if user exists
+  const user = await getUserByEmail(email);
+  if (!user) {
+    throw new ServiceError(ErrorCode.USER_NOT_FOUND);
+  }
+
+  // Note: In production, add logic to check if email is already verified
+  // For now, we allow resending codes as the user table doesn't have a verified flag yet
+
+  const code = generateResetCode();
+  const expiresAt = new Date();
+  expiresAt.setMinutes(expiresAt.getMinutes() + 15); // Code expires in 15 minutes
+
+  // Delete any existing verification code for this email
+  await db.delete(verificationCodes).where(eq(verificationCodes.email, email));
+
+  // Insert new verification code
+  await db.insert(verificationCodes).values({
+    email,
+    code,
+    expiresAt: expiresAt.toISOString(),
+  });
+
+  // In production, this would send an email
+  // WARNING: Logging verification codes is a security vulnerability. Remove in production.
+  console.log(`Verification code for ${email}: ${code}`);
+
+  return { code, expiresAt };
+}
+
+/**
+ * Verify email with OTP code
+ * NOTE: In production, implement rate limiting (e.g., max 5 attempts per 15 minutes)
+ */
+export async function verifyEmail(email: string, code: string): Promise<void> {
+  // Validate code format
+  if (!/^\d{6}$/.test(code)) {
+    throw new ServiceError(ErrorCode.INVALID_CODE_FORMAT);
+  }
+
+  // Check if user exists
+  const user = await getUserByEmail(email);
+  if (!user) {
+    throw new ServiceError(ErrorCode.USER_NOT_FOUND);
+  }
+
+  // Check if verification code exists
+  const [verificationData] = await db
+    .select()
+    .from(verificationCodes)
+    .where(eq(verificationCodes.email, email))
+    .limit(1);
+
+  if (!verificationData) {
+    throw new ServiceError(ErrorCode.VERIFICATION_CODE_NOT_FOUND);
+  }
+
+  // Check if code matches (constant-time comparison)
+  if (!safeStringCompare(verificationData.code, code)) {
+    throw new ServiceError(ErrorCode.INVALID_VERIFICATION_CODE);
+  }
+
+  // Check if code has expired
+  if (new Date() > new Date(verificationData.expiresAt)) {
+    await db.delete(verificationCodes).where(eq(verificationCodes.email, email));
+    throw new ServiceError(ErrorCode.VERIFICATION_CODE_EXPIRED);
+  }
+
+  // Code is valid - delete it
+  await db.delete(verificationCodes).where(eq(verificationCodes.email, email));
+
+  // Note: In production, you would update a `verified` flag on the user record
+  // For now, successful verification just consumes the code
 }
