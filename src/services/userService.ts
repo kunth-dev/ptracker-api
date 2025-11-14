@@ -108,6 +108,11 @@ export async function loginUser(email: string, password: string): Promise<User> 
     throw new ServiceError(ErrorCode.INVALID_CREDENTIALS);
   }
 
+  // Check if account is verified
+  if (!matchedUser.verified) {
+    throw new ServiceError(ErrorCode.ACCOUNT_NOT_VERIFIED);
+  }
+
   // Use constant-time comparison to prevent timing attacks
   if (safeStringCompare(matchedUser.password, hashedPassword, "hex")) {
     const { password: _, ...userWithoutPassword } = matchedUser;
@@ -126,6 +131,11 @@ export async function sendResetCode(email: string): Promise<{ code: string; expi
   const user = await getUserByEmail(email);
   if (!user) {
     throw new ServiceError(ErrorCode.USER_NOT_FOUND);
+  }
+
+  // Check if account is verified
+  if (!user.verified) {
+    throw new ServiceError(ErrorCode.ACCOUNT_NOT_VERIFIED);
   }
 
   const code = generateResetCode();
@@ -281,9 +291,6 @@ export async function sendVerificationCode(
     throw new ServiceError(ErrorCode.USER_NOT_FOUND);
   }
 
-  // Note: In production, add logic to check if email is already verified
-  // For now, we allow resending codes as the user table doesn't have a verified flag yet
-
   const code = generateResetCode();
   const expiresAt = new Date();
   expiresAt.setMinutes(expiresAt.getMinutes() + 15); // Code expires in 15 minutes
@@ -342,11 +349,17 @@ export async function verifyEmail(email: string, code: string): Promise<void> {
     throw new ServiceError(ErrorCode.VERIFICATION_CODE_EXPIRED);
   }
 
+  // Update user's verified status
+  await db
+    .update(users)
+    .set({
+      verified: true,
+      updatedAt: new Date().toISOString(),
+    })
+    .where(eq(users.email, email));
+
   // Code is valid - delete it
   await db.delete(verificationCodes).where(eq(verificationCodes.email, email));
-
-  // Note: In production, you would update a `verified` flag on the user record
-  // For now, successful verification just consumes the code
 }
 
 /**
@@ -392,11 +405,17 @@ export async function confirmAccountByToken(token: string): Promise<void> {
     throw new ServiceError(ErrorCode.USER_NOT_FOUND);
   }
 
+  // Update user's verified status
+  await db
+    .update(users)
+    .set({
+      verified: true,
+      updatedAt: new Date().toISOString(),
+    })
+    .where(eq(users.email, confirmationData.email));
+
   // Token is valid - delete it (can only be used once)
   await db.delete(confirmationTokens).where(eq(confirmationTokens.token, token));
-
-  // Note: In production, you would update a `verified` flag on the user record
-  // For now, successful confirmation just consumes the token
 }
 
 /**
@@ -409,9 +428,6 @@ export async function resendConfirmationEmail(email: string): Promise<void> {
   if (!user) {
     throw new ServiceError(ErrorCode.USER_NOT_FOUND);
   }
-
-  // Note: In production, add logic to check if email is already verified
-  // For now, we allow resending tokens as the user table doesn't have a verified flag yet
 
   await generateAndSendConfirmationToken(email);
 }
