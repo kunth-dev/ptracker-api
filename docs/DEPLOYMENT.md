@@ -20,6 +20,13 @@ Configure these secrets in your GitHub repository (Settings > Secrets and variab
 2. `SERVER_SSH_LOGIN` - SSH username (e.g., `root` or `deploy`)
 3. `SERVER_SSH_PASSWORD` - SSH password for authentication
 4. `BEARER_TOKENS` - Comma-separated list of valid bearer tokens for API authentication
+5. `POSTGRES_PASSWORD` - Strong password for PostgreSQL database
+6. `DRIZZLE_GATEWAY_MASTERPASS` - Master password for Drizzle Gateway web interface
+
+### Optional Secrets (for Email Functionality)
+
+7. `SMPT_APP_PASS` - Application-specific password for SMTP authentication (e.g., Gmail app password)
+   - **Note**: If not configured, email sending will be disabled and verification codes will be logged to console
 
 ### Repository Variables
 
@@ -30,6 +37,17 @@ Configure these variables in your GitHub repository (Settings > Secrets and vari
 3. `NODE_ENV` - Environment mode (default: `production`)
 4. `PORT` - API server port (default: `3002`)
 5. `TRUST_PROXY` - Set to `true` when behind a reverse proxy (default: `true`)
+6. `POSTGRES_DB` - PostgreSQL database name (default: `price_tracker_db`)
+7. `POSTGRES_USER` - PostgreSQL username (default: `postgres_user`)
+
+### Optional Variables (for Email Functionality)
+
+8. `SMPT_HOST` - SMTP server hostname (e.g., `smtp.gmail.com`)
+9. `SMPT_PORT` - SMTP server port (e.g., `587` for TLS, `465` for SSL)
+10. `SMPT_SERVICE` - SMTP service name (e.g., `gmail`, `outlook`, `yahoo`)
+11. `SMPT_MAIL` - Email address to send from (e.g., `noreply@yourdomain.com`)
+
+**Note**: For email functionality to work, you must configure all SMTP variables along with the `SMPT_APP_PASS` secret.
 
 ## Deployment Process
 
