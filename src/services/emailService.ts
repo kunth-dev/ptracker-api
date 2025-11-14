@@ -50,6 +50,10 @@ class EmailService implements IEmailService {
           pass: env.SMPT_APP_PASS,
         },
         ...(env.SMPT_SERVICE && { service: env.SMPT_SERVICE }),
+        // Add timeout configurations to prevent hanging connections
+        connectionTimeout: 10000, // 10 seconds for initial connection
+        greetingTimeout: 10000, // 10 seconds for greeting after connection
+        socketTimeout: 30000, // 30 seconds for socket inactivity timeout
       });
 
       logger.info("Email transporter initialized successfully");
