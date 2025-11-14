@@ -36,6 +36,7 @@ export function handleServiceError(error: unknown): never {
       [ErrorCode.USER_NOT_FOUND]: 404,
       [ErrorCode.USER_ALREADY_EXISTS]: 409,
       [ErrorCode.EMAIL_ALREADY_IN_USE]: 409,
+      [ErrorCode.ACCOUNT_NOT_VERIFIED]: 403,
       [ErrorCode.RESET_CODE_NOT_FOUND]: 404,
       [ErrorCode.INVALID_RESET_CODE]: 400,
       [ErrorCode.RESET_CODE_EXPIRED]: 400,

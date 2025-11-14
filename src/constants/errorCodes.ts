@@ -18,6 +18,7 @@ export enum ErrorCode {
   USER_NOT_FOUND = "USER_NOT_FOUND",
   USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS",
   EMAIL_ALREADY_IN_USE = "EMAIL_ALREADY_IN_USE",
+  ACCOUNT_NOT_VERIFIED = "ACCOUNT_NOT_VERIFIED",
 
   // Password reset errors (4xxx)
   RESET_CODE_NOT_FOUND = "RESET_CODE_NOT_FOUND",
@@ -57,6 +58,8 @@ export const ErrorMessages: Record<ErrorCode, string> = {
   [ErrorCode.USER_NOT_FOUND]: "User not found",
   [ErrorCode.USER_ALREADY_EXISTS]: "User with this email already exists",
   [ErrorCode.EMAIL_ALREADY_IN_USE]: "Email already in use",
+  [ErrorCode.ACCOUNT_NOT_VERIFIED]:
+    "Account is not verified. Please verify your account before proceeding.",
 
   [ErrorCode.RESET_CODE_NOT_FOUND]: "No reset code found for this email",
   [ErrorCode.INVALID_RESET_CODE]: "Invalid reset code",

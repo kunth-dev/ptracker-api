@@ -4,6 +4,7 @@ import { z } from "zod";
 export interface User {
   userId: string;
   email: string;
+  verified: boolean;
   createdAt: string;
   updatedAt: string;
 }
