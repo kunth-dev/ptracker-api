@@ -645,6 +645,21 @@ curl -X POST http://localhost:3002/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"password123"}'
 
+# Forgot Password
+curl -X POST http://localhost:3002/api/auth/forgot-password \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com"}'
+
+# Send Reset Code
+curl -X POST http://localhost:3002/api/auth/send-reset-code \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com"}'
+
+# Reset Password
+curl -X POST http://localhost:3002/api/auth/reset-password \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","code":"123456","newPassword":"newpassword123"}'
+
 # Get user data (requires auth)
 curl -X GET http://localhost:3002/api/user/USER_ID_HERE \
   -H "Authorization: Bearer your_secret_bearer_token_here"
