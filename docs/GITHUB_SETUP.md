@@ -78,23 +78,45 @@ Click on **"New repository variable"** for each of the following:
 - **Value**: `true`
 - **Description**: Trust proxy headers when behind reverse proxy
 
+---
+
+### SMTP Configuration (Optional - All Required for Email Functionality)
+
+**Important**: For email sending to work, you must configure ALL of the following SMTP variables together:
+- `SMTP_HOST` (variable)
+- `SMTP_PORT` (variable)
+- `SMTP_MAIL` (variable)
+- `SMTP_APP_PASS` (secret)
+
+If any of these are missing, email sending will be disabled and verification codes will only be logged to the console.
+
 ### 6. SMTP_HOST (Optional)
 - **Name**: `SMTP_HOST`
 - **Value**: SMTP server hostname
 - **Example**: `smtp.gmail.com`
 - **Description**: Required for email sending functionality
+- **Note**: All 4 SMTP variables must be configured together for emails to work
 
 ### 7. SMTP_PORT (Optional)
 - **Name**: `SMTP_PORT`
 - **Value**: SMTP server port
 - **Example**: `587` (for TLS) or `465` (for SSL)
 - **Description**: Required for email sending functionality
+- **Note**: All 4 SMTP variables must be configured together for emails to work
 
-### 8. SMTP_MAIL
+### 8. SMTP_MAIL (Optional)
 - **Name**: `SMTP_MAIL`
 - **Value**: Email address to send from
 - **Example**: `noreply@yourdomain.com`
 - **Description**: Required for email sending functionality
+- **Note**: All 4 SMTP variables must be configured together for emails to work
+
+### 9. APP_DOMAIN
+- **Name**: `APP_DOMAIN`
+- **Value**: Full URL of your application domain
+- **Example**: `https://khdev.ru` or `https://api.khdev.ru`
+- **Description**: Used for generating email confirmation links
+- **Important**: Must include protocol (http:// or https://)
 
 ## Server Prerequisites
 

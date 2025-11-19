@@ -30,7 +30,7 @@ const EnvSchema = z.object({
       return tokens;
     }),
   // Application Configuration
-  APP_DOMAIN: z.string().url().default("http://localhost:3000"),
+  APP_DOMAIN: z.string().default("http://localhost:3002"),
   // SMTP Configuration
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z
