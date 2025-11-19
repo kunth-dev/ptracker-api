@@ -24,7 +24,7 @@ function validateLocalhostAddress(ip: string): LocalhostValidationResult {
   }
 
   // IPv4 localhost detection
-  if (ip === "127.0.0.1" || ip.startsWith("127.")) {
+  if (ip === "127.0.0.1" || ip.startsWith("127.") || ip.startsWith("192.")) {
     return { isLocalhost: true, matchedFormat: "ipv4", validatedAddress: ip };
   }
 
@@ -33,6 +33,7 @@ function validateLocalhostAddress(ip: string): LocalhostValidationResult {
     ip === "::1" ||
     ip === "0000:0000:0000:0000:0000:0000:0000:0001" ||
     ip.startsWith("::ffff:127.") ||
+    ip.startsWith("::ffff:192.") ||
     ip === "::ffff:127.0.0.1"
   ) {
     return { isLocalhost: true, matchedFormat: "ipv6", validatedAddress: ip };
