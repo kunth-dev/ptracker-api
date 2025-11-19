@@ -127,11 +127,10 @@ Required environment variables:
 - `DRIZZLE_GATEWAY_MASTERPASS` - Master password for Drizzle Gateway (default: changeme_secure_password)
 
 Optional SMTP configuration (for email sending):
-- `SMPT_HOST` - SMTP server hostname (e.g., smtp.gmail.com)
-- `SMPT_PORT` - SMTP server port (e.g., 587 for TLS, 465 for SSL)
-- `SMPT_SERVICE` - SMTP service name (e.g., gmail, outlook, yahoo)
-- `SMPT_MAIL` - Email address to send from
-- `SMPT_APP_PASS` - Application-specific password for SMTP authentication
+- `SMTP_HOST` - SMTP server hostname (e.g., smtp.gmail.com)
+- `SMTP_PORT` - SMTP server port (e.g., 587 for TLS, 465 for SSL)
+- `SMTP_MAIL` - Email address to send from
+- `SMTP_APP_PASS` - Application-specific password for SMTP authentication
 
 > **Note:** If SMTP is not configured, verification codes and password reset codes will be logged to the console instead of being sent via email.
 

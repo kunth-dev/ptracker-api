@@ -25,7 +25,7 @@ Configure these secrets in your GitHub repository (Settings > Secrets and variab
 
 ### Optional Secrets (for Email Functionality)
 
-7. `SMPT_APP_PASS` - Application-specific password for SMTP authentication (e.g., Gmail app password)
+7. `SMTP_APP_PASS` - Application-specific password for SMTP authentication (e.g., Gmail app password)
    - **Note**: If not configured, email sending will be disabled and verification codes will be logged to console
 
 ### Repository Variables
@@ -39,15 +39,11 @@ Configure these variables in your GitHub repository (Settings > Secrets and vari
 5. `TRUST_PROXY` - Set to `true` when behind a reverse proxy (default: `true`)
 6. `POSTGRES_DB` - PostgreSQL database name (default: `price_tracker_db`)
 7. `POSTGRES_USER` - PostgreSQL username (default: `postgres_user`)
+8. `SMTP_HOST` - SMTP server hostname (e.g., `smtp.gmail.com`)
+9. `SMTP_PORT` - SMTP server port (e.g., `587` for TLS, `465` for SSL)
+10. `SMTP_MAIL` - Email address to send from (e.g., `noreply@yourdomain.com`)
 
-### Optional Variables (for Email Functionality)
-
-8. `SMPT_HOST` - SMTP server hostname (e.g., `smtp.gmail.com`)
-9. `SMPT_PORT` - SMTP server port (e.g., `587` for TLS, `465` for SSL)
-10. `SMPT_SERVICE` - SMTP service name (e.g., `gmail`, `outlook`, `yahoo`)
-11. `SMPT_MAIL` - Email address to send from (e.g., `noreply@yourdomain.com`)
-
-**Note**: For email functionality to work, you must configure all SMTP variables along with the `SMPT_APP_PASS` secret.
+**Note**: For email functionality to work, you must configure all SMTP variables along with the `SMTP_APP_PASS` secret.
 
 ## Deployment Process
 

@@ -31,10 +31,10 @@ class EmailService implements IEmailService {
    */
   private initializeTransporter(): void {
     // Check if SMTP is configured
-    if (!env.SMPT_HOST || !env.SMPT_PORT || !env.SMPT_MAIL || !env.SMPT_APP_PASS) {
+    if (!env.SMTP_HOST || !env.SMTP_PORT || !env.SMTP_MAIL || !env.SMTP_APP_PASS) {
       logger.warn(
         "SMTP configuration is incomplete. Email sending will be disabled. " +
-          "Please configure SMPT_HOST, SMPT_PORT, SMPT_MAIL, and SMPT_APP_PASS environment variables.",
+          "Please configure SMTP_HOST, SMTP_PORT, SMTP_MAIL, and SMTP_APP_PASS environment variables.",
       );
       return;
     }
@@ -42,14 +42,13 @@ class EmailService implements IEmailService {
     try {
       // Create transporter with SMTP configuration
       this.transporter = nodemailer.createTransport({
-        host: env.SMPT_HOST,
-        port: env.SMPT_PORT,
-        secure: env.SMPT_PORT === 465, // true for 465, false for other ports
+        host: env.SMTP_HOST,
+        port: env.SMTP_PORT,
+        secure: env.SMTP_PORT === 465, // true for 465, false for other ports
         auth: {
-          user: env.SMPT_MAIL,
-          pass: env.SMPT_APP_PASS,
+          user: env.SMTP_MAIL,
+          pass: env.SMTP_APP_PASS,
         },
-        ...(env.SMPT_SERVICE && { service: env.SMPT_SERVICE }),
         // Add timeout configurations to prevent hanging connections
         connectionTimeout: 10000, // 10 seconds for initial connection
         greetingTimeout: 10000, // 10 seconds for greeting after connection
@@ -76,7 +75,7 @@ class EmailService implements IEmailService {
 
     try {
       const mailOptions = {
-        from: `"Price Tracker" <${env.SMPT_MAIL}>`,
+        from: `"Price Tracker" <${env.SMTP_MAIL}>`,
         to: email,
         subject: "Email Verification Code",
         text: `Your verification code is: ${code}\n\nThis code will expire in 15 minutes.\n\nIf you did not request this code, please ignore this email.`,
@@ -95,9 +94,8 @@ class EmailService implements IEmailService {
       logger.info(`Verification email sent to ${email}`);
     } catch (error) {
       logger.error(`Failed to send verification email to ${email}`, { error });
-      // Fallback to console log on error
+      // Fallback to console log on error - don't throw to allow operation to complete
       console.log(`Verification code for ${email}: ${code}`);
-      throw new Error("Failed to send verification email");
     }
   }
 
@@ -114,7 +112,7 @@ class EmailService implements IEmailService {
 
     try {
       const mailOptions = {
-        from: `"Price Tracker" <${env.SMPT_MAIL}>`,
+        from: `"Price Tracker" <${env.SMTP_MAIL}>`,
         to: email,
         subject: "Password Reset Code",
         text: `Your password reset code is: ${code}\n\nThis code will expire in 15 minutes.\n\nIf you did not request this code, please ignore this email and your password will remain unchanged.`,
@@ -133,9 +131,8 @@ class EmailService implements IEmailService {
       logger.info(`Password reset email sent to ${email}`);
     } catch (error) {
       logger.error(`Failed to send password reset email to ${email}`, { error });
-      // Fallback to console log on error
+      // Fallback to console log on error - don't throw to allow operation to complete
       console.log(`Reset code for ${email}: ${code}`);
-      throw new Error("Failed to send password reset email");
     }
   }
 
@@ -143,19 +140,18 @@ class EmailService implements IEmailService {
    * Send confirmation email with link
    */
   public async sendConfirmationEmail(email: string, token: string): Promise<void> {
+    const confirmationLink = `${env.APP_DOMAIN}/register/confirmation?uuid=${token}`;
+
     if (!this.transporter) {
       // Fallback to console log when SMTP is not configured
       logger.warn(`Email sending is disabled. Confirmation token for ${email}: ${token}`);
-      console.log(
-        `Confirmation link for ${email}: https://khdev.ru/register/confirmation?uuid=${token}`,
-      );
+      console.log(`Confirmation link for ${email}: ${confirmationLink}`);
       return;
     }
 
     try {
-      const confirmationLink = `https://khdev.ru/register/confirmation?uuid=${token}`;
       const mailOptions = {
-        from: `"Price Tracker" <${env.SMPT_MAIL}>`,
+        from: `"Price Tracker" <${env.SMTP_MAIL}>`,
         to: email,
         subject: "Confirm Your Email Address",
         text: `Please confirm your email address by clicking the link below:\n\n${confirmationLink}\n\nThis link can only be used once.\n\nIf you did not create an account, please ignore this email.`,
@@ -177,11 +173,8 @@ class EmailService implements IEmailService {
       logger.info(`Confirmation email sent to ${email}`);
     } catch (error) {
       logger.error(`Failed to send confirmation email to ${email}`, { error });
-      // Fallback to console log on error
-      console.log(
-        `Confirmation link for ${email}: https://khdev.ru/register/confirmation?uuid=${token}`,
-      );
-      throw new Error("Failed to send confirmation email");
+      // Fallback to console log on error - don't throw to allow registration to complete
+      console.log(`Confirmation link for ${email}: ${confirmationLink}`);
     }
   }
 }

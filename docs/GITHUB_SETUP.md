@@ -40,8 +40,8 @@ Click on **"New repository secret"** for each of the following:
 - **Example**: Generate with `openssl rand -base64 32`
 - **Description**: Secure password for accessing the Drizzle Gateway database management UI
 
-### 7. SMPT_APP_PASS (Optional)
-- **Name**: `SMPT_APP_PASS`
+### 7. SMTP_APP_PASS (Optional)
+- **Name**: `SMTP_APP_PASS`
 - **Value**: Application-specific password for SMTP authentication
 - **Example**: For Gmail, generate an app password at https://myaccount.google.com/apppasswords
 - **Description**: Required for email sending functionality (verification codes, password resets)
@@ -78,26 +78,20 @@ Click on **"New repository variable"** for each of the following:
 - **Value**: `true`
 - **Description**: Trust proxy headers when behind reverse proxy
 
-### 6. SMPT_HOST (Optional)
-- **Name**: `SMPT_HOST`
+### 6. SMTP_HOST (Optional)
+- **Name**: `SMTP_HOST`
 - **Value**: SMTP server hostname
 - **Example**: `smtp.gmail.com`
 - **Description**: Required for email sending functionality
 
-### 7. SMPT_PORT (Optional)
-- **Name**: `SMPT_PORT`
+### 7. SMTP_PORT (Optional)
+- **Name**: `SMTP_PORT`
 - **Value**: SMTP server port
 - **Example**: `587` (for TLS) or `465` (for SSL)
 - **Description**: Required for email sending functionality
 
-### 8. SMPT_SERVICE (Optional)
-- **Name**: `SMPT_SERVICE`
-- **Value**: SMTP service name
-- **Example**: `gmail`, `outlook`, or `yahoo`
-- **Description**: Optional service name for SMTP configuration
-
-### 9. SMPT_MAIL (Optional)
-- **Name**: `SMPT_MAIL`
+### 8. SMTP_MAIL
+- **Name**: `SMTP_MAIL`
 - **Value**: Email address to send from
 - **Example**: `noreply@yourdomain.com`
 - **Description**: Required for email sending functionality

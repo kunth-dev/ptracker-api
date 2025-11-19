@@ -5,6 +5,6 @@ export default defineConfig({
   out: "./drizzle",
   dialect: "postgresql",
   dbCredentials: {
-    url: process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/price_tracker_db",
+    url: process.env.DATABASE_URL || "postgresql://postgres_user:postgres_password@localhost:5432/price_tracker_db",
   },
 });

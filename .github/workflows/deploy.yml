@@ -18,7 +18,7 @@ jobs:
           BEARER_TOKENS: ${{ secrets.BEARER_TOKENS }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           DRIZZLE_GATEWAY_MASTERPASS: ${{ secrets.DRIZZLE_GATEWAY_MASTERPASS }}
-          SMPT_APP_PASS: ${{ secrets.SMPT_APP_PASS }}
+          SMTP_APP_PASS: ${{ secrets.SMTP_APP_PASS }}
         run: |
           error_found=false
           
@@ -52,8 +52,8 @@ jobs:
             error_found=true
           fi
           
-          if [ -z "$SMPT_APP_PASS" ]; then
-            echo "::warning::SECRET 'SMPT_APP_PASS' is not configured. SMTP email sending will be disabled."
+          if [ -z "$SMTP_APP_PASS" ]; then
+            echo "::warning::SECRET 'SMTP_APP_PASS' is not configured. SMTP email sending will be disabled."
           fi
           
           if [ "$error_found" = true ]; then
@@ -128,11 +128,10 @@ jobs:
             POSTGRES_USER=${{ vars.POSTGRES_USER || 'postgres_user' }}
             POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
             DRIZZLE_GATEWAY_MASTERPASS=${{ secrets.DRIZZLE_GATEWAY_MASTERPASS }}
-            SMPT_HOST=${{ vars.SMPT_HOST || '' }}
-            SMPT_PORT=${{ vars.SMPT_PORT || '' }}
-            SMPT_SERVICE=${{ vars.SMPT_SERVICE || '' }}
-            SMPT_MAIL=${{ vars.SMPT_MAIL || '' }}
-            SMPT_APP_PASS=${{ secrets.SMPT_APP_PASS || '' }}
+            SMTP_HOST=${{ vars.SMTP_HOST || '' }}
+            SMTP_PORT=${{ vars.SMTP_PORT || '' }}
+            SMTP_MAIL=${{ vars.SMTP_MAIL || '' }}
+            SMTP_APP_PASS=${{ secrets.SMTP_APP_PASS || '' }}
             EOF
       
       - name: Deploy with Docker Compose
