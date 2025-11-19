@@ -150,6 +150,32 @@ SMTP_MAIL=your-ses-smtp-username
 SMTP_APP_PASS=your-ses-smtp-password
 ```
 
+### Yandex Mail (Russian provider)
+```env
+SMTP_HOST=smtp.yandex.ru
+SMTP_PORT=465
+SMTP_MAIL=your-email@yandex.ru
+SMTP_APP_PASS=your-app-password
+```
+
+**Note**: Requires [App Password](https://yandex.ru/support/id/authorization/app-passwords.html) generation in Yandex settings.
+
+### Mail.ru (Russian provider)
+```env
+SMTP_HOST=smtp.mail.ru
+SMTP_PORT=465
+SMTP_MAIL=your-email@mail.ru
+SMTP_APP_PASS=your-password
+```
+
+### Rambler (Russian provider)
+```env
+SMTP_HOST=smtp.rambler.ru
+SMTP_PORT=465
+SMTP_MAIL=your-email@rambler.ru
+SMTP_APP_PASS=your-password
+```
+
 ## Docker-Specific Considerations
 
 ### DNS Configuration (Already Applied)

@@ -73,7 +73,38 @@ Similar to SendGrid, professional email service.
 
 ---
 
-### Option 4: Test Which Ports Work (Diagnostic)
+### Option 4: Use Russian Email Providers
+
+If you're in Russia or your server is in Russia, these providers may work better:
+
+**Yandex Mail (Recommended for Russia):**
+```env
+SMTP_HOST=smtp.yandex.ru
+SMTP_PORT=465
+SMTP_MAIL=your-email@yandex.ru
+SMTP_APP_PASS=your-app-password
+```
+Requires app password from Yandex settings.
+
+**Mail.ru:**
+```env
+SMTP_HOST=smtp.mail.ru
+SMTP_PORT=465
+SMTP_MAIL=your-email@mail.ru
+SMTP_APP_PASS=your-password
+```
+
+**Rambler:**
+```env
+SMTP_HOST=smtp.rambler.ru
+SMTP_PORT=465
+SMTP_MAIL=your-email@rambler.ru
+SMTP_APP_PASS=your-password
+```
+
+---
+
+### Option 5: Test Which Ports Work (Diagnostic)
 
 Run this on your production server to see which SMTP ports are accessible:
 
@@ -91,11 +122,11 @@ chmod +x scripts/test-smtp-ports.sh
 bash scripts/test-smtp-ports.sh
 ```
 
-This will show you which providers and ports are accessible from your server.
+This will test Gmail, SendGrid, Mailgun, Yandex, Mail.ru, and Rambler to show you which providers and ports are accessible from your server.
 
 ---
 
-### Option 5: Use Host Networking (Linux Only)
+### Option 6: Use Host Networking (Linux Only)
 
 If your server runs Linux and you have root access, you can bypass Docker network isolation.
 

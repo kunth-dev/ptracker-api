@@ -18,6 +18,12 @@ SERVERS=(
   "smtp.sendgrid.net:465:SendGrid SSL"
   "smtp.mailgun.org:587:Mailgun TLS"
   "smtp.mailgun.org:465:Mailgun SSL"
+  "smtp.yandex.ru:587:Yandex TLS"
+  "smtp.yandex.ru:465:Yandex SSL"
+  "smtp.mail.ru:587:Mail.ru TLS"
+  "smtp.mail.ru:465:Mail.ru SSL"
+  "smtp.rambler.ru:587:Rambler TLS"
+  "smtp.rambler.ru:465:Rambler SSL"
 )
 
 for server_info in "${SERVERS[@]}"; do
