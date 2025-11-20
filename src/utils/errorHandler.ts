@@ -35,6 +35,7 @@ export function handleServiceError(error: unknown): never {
       [ErrorCode.INVALID_TOKEN]: 401,
       [ErrorCode.USER_NOT_FOUND]: 404,
       [ErrorCode.USER_ALREADY_EXISTS]: 409,
+      [ErrorCode.USER_ALREADY_EXISTS_NOT_VERIFIED]: 409,
       [ErrorCode.EMAIL_ALREADY_IN_USE]: 409,
       [ErrorCode.ACCOUNT_NOT_VERIFIED]: 403,
       [ErrorCode.RESET_CODE_NOT_FOUND]: 404,

@@ -17,6 +17,7 @@ export enum ErrorCode {
   // User errors (3xxx)
   USER_NOT_FOUND = "USER_NOT_FOUND",
   USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS",
+  USER_ALREADY_EXISTS_NOT_VERIFIED = "USER_ALREADY_EXISTS_NOT_VERIFIED",
   EMAIL_ALREADY_IN_USE = "EMAIL_ALREADY_IN_USE",
   ACCOUNT_NOT_VERIFIED = "ACCOUNT_NOT_VERIFIED",
 
@@ -57,6 +58,8 @@ export const ErrorMessages: Record<ErrorCode, string> = {
 
   [ErrorCode.USER_NOT_FOUND]: "User not found",
   [ErrorCode.USER_ALREADY_EXISTS]: "User with this email already exists",
+  [ErrorCode.USER_ALREADY_EXISTS_NOT_VERIFIED]:
+    "Account already exists but is not verified. A verification link has been sent to your email.",
   [ErrorCode.EMAIL_ALREADY_IN_USE]: "Email already in use",
   [ErrorCode.ACCOUNT_NOT_VERIFIED]:
     "Account is not verified. Please verify your account before proceeding.",
