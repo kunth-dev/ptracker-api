@@ -41,6 +41,19 @@ export async function createUser(email: string, password: string): Promise<User>
   // Check if user already exists
   const existingUser = await db.select().from(users).where(eq(users.email, email)).limit(1);
   if (existingUser.length > 0) {
+    const [user] = existingUser;
+
+    if (!user) {
+      throw new ServiceError(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to retrieve user");
+    }
+
+    // If user exists but is not verified, resend confirmation email
+    if (!user.verified) {
+      await generateAndSendConfirmationToken(email);
+      throw new ServiceError(ErrorCode.USER_ALREADY_EXISTS_NOT_VERIFIED);
+    }
+
+    // User exists and is verified
     throw new ServiceError(ErrorCode.USER_ALREADY_EXISTS);
   }
 
