@@ -62,6 +62,7 @@ The easiest way to get started is using Docker Compose, which will set up both t
    - API: <http://localhost:3002/api>
    - PostgreSQL: localhost:5432 (credentials: postgres/postgres)
    - Drizzle Gateway: <http://localhost:4983>
+   - For SSL/HTTPS access in production, see [SSL Configuration](#ssl-configuration)
 
 #### Docker Commands
 
@@ -171,7 +172,56 @@ npm run db:studio    # Open Drizzle Studio (database GUI)
 
 For production deployment to a remote server, see the [Deployment Guide](./docs/DEPLOYMENT.md).
 
-The application can be deployed using GitHub Actions with automated Docker deployment via SSH to a remote server with nginx reverse proxy.
+The application can be deployed using GitHub Actions with automated Docker deployment via SSH to a remote server with nginx reverse proxy and free SSL certificates from Let's Encrypt.
+
+## SSL Configuration
+
+The project includes automated SSL certificate management using Let's Encrypt and certbot:
+
+### Features
+- **Automatic SSL Certificate Generation**: Free SSL certificates from Let's Encrypt
+- **Auto-Renewal**: Certificates automatically renew every 12 hours
+- **Nginx Reverse Proxy**: Built-in nginx configuration for API and Drizzle Studio
+- **HTTPS Support**: Automatic HTTP to HTTPS redirects
+
+### Quick Setup
+
+1. **Configure environment variables** in `.env`:
+   ```bash
+   API_DOMAIN=api.yourdomain.com
+   STUDIO_DOMAIN=studio.yourdomain.com
+   SSL_EMAIL=admin@yourdomain.com
+   ```
+
+2. **Initialize SSL certificates** (first time only):
+   ```bash
+   # Make sure your domains point to your server
+   # Run the initialization script
+   API_DOMAIN=api.yourdomain.com \
+   STUDIO_DOMAIN=studio.yourdomain.com \
+   EMAIL=admin@yourdomain.com \
+   ./scripts/init-ssl.sh
+   ```
+
+3. **Start all services**:
+   ```bash
+   docker-compose up -d
+   ```
+
+Your services will be available at:
+- API: `https://api.yourdomain.com`
+- Drizzle Studio: `https://studio.yourdomain.com`
+
+### Manual SSL Setup
+
+If you prefer to set up SSL certificates manually or the automatic setup fails, see the [Deployment Guide](./docs/DEPLOYMENT.md) for detailed nginx and certbot configuration instructions.
+
+### Local Development (No SSL)
+
+For local development without SSL, you can still access services via HTTP:
+- Comment out the `nginx` and `certbot` services in `docker-compose.yml`
+- Uncomment the `ports` sections for `backend` and `drizzle-gateway` services
+- Access services at `http://localhost:3002` and `http://localhost:4983`
 
 ## API Documentation
 

@@ -22,6 +22,7 @@ Configure these secrets in your GitHub repository (Settings > Secrets and variab
 4. `BEARER_TOKENS` - Comma-separated list of valid bearer tokens for API authentication
 5. `POSTGRES_PASSWORD` - Strong password for PostgreSQL database
 6. `DRIZZLE_GATEWAY_MASTERPASS` - Master password for Drizzle Gateway web interface
+7. `SSL_EMAIL` - Email address for Let's Encrypt SSL certificate notifications and renewal reminders
 
 ### Optional Secrets (for Email Functionality)
 
@@ -39,9 +40,11 @@ Configure these variables in your GitHub repository (Settings > Secrets and vari
 5. `TRUST_PROXY` - Set to `true` when behind a reverse proxy (default: `true`)
 6. `POSTGRES_DB` - PostgreSQL database name (default: `price_tracker_db`)
 7. `POSTGRES_USER` - PostgreSQL username (default: `postgres_user`)
-8. `SMTP_HOST` - SMTP server hostname (e.g., `smtp.gmail.com`)
-9. `SMTP_PORT` - SMTP server port (e.g., `587` for TLS, `465` for SSL)
-10. `SMTP_MAIL` - Email address to send from (e.g., `noreply@yourdomain.com`)
+8. `API_DOMAIN` - Domain for API service (e.g., `api.khdev.ru`)
+9. `STUDIO_DOMAIN` - Domain for Drizzle Studio (e.g., `studio.khdev.ru`)
+10. `SMTP_HOST` - SMTP server hostname (e.g., `smtp.gmail.com`)
+11. `SMTP_PORT` - SMTP server port (e.g., `587` for TLS, `465` for SSL)
+12. `SMTP_MAIL` - Email address to send from (e.g., `noreply@yourdomain.com`)
 
 **Note**: For email functionality to work, you must configure all SMTP variables along with the `SMTP_APP_PASS` secret.
 
@@ -60,14 +63,20 @@ Configure these variables in your GitHub repository (Settings > Secrets and vari
 
 The deployment workflow performs the following steps:
 
-1. **Checkout Code**: Checks out the selected branch
-2. **Create Directories**: Creates necessary directories on the remote server
-3. **Copy Files**: Transfers application files to `/var/www/ptracker-api`
-4. **Create Environment File**: Generates `.env` file with configuration from GitHub secrets/variables
-5. **Deploy with Docker**: Builds and starts Docker containers using `docker-compose.yml`
-6. **Verify Deployment**: Checks container status and logs
+1. **Validate Secrets**: Checks that all required secrets and variables are configured
+2. **Checkout Code**: Checks out the selected branch
+3. **Create Directories**: Creates necessary directories on the remote server
+4. **Copy Files**: Transfers application files to `/var/www/ptracker-api`
+5. **Create Environment File**: Generates `.env` file with configuration from GitHub secrets/variables
+6. **Initialize SSL Certificates**: Automatically obtains free SSL certificates from Let's Encrypt (first deployment only)
+7. **Deploy with Docker**: Builds and starts Docker containers using `docker-compose.yml`
+8. **Verify Deployment**: Checks container status and logs
 
-> **Note**: Nginx configuration should be set up manually on the server to expose the API at `api.khdev.ru` and Drizzle Studio at `studio.khdev.ru`.
+The deployment includes:
+- **Nginx Reverse Proxy**: Automatically configured with SSL/TLS support
+- **Let's Encrypt SSL**: Free SSL certificates with automatic renewal
+- **HTTP to HTTPS Redirect**: All HTTP traffic is automatically redirected to HTTPS
+- **Security Headers**: HSTS, X-Frame-Options, and other security headers are automatically added
 
 ## Server Structure
 
@@ -89,22 +98,33 @@ After deployment, the following structure is created on the remote server:
 
 ## Services
 
-The deployment creates three Docker containers:
+The deployment creates five Docker containers:
 
 ### 1. PostgreSQL Database (`price-tracker-postgres`)
 - Internal database service
 - Data persisted in Docker volume `postgres_data`
-- Accessible on port 5432
+- Accessible internally on port 5432
 
 ### 2. Backend API (`price-tracker-api`)
 - Runs the Price Tracker API
-- Accessible at `http://localhost:3002` or `http://server-ip:3002`
-- Should be exposed via nginx reverse proxy at `https://api.khdev.ru`
+- Exposed via nginx reverse proxy at `https://api.khdev.ru`
+- Internal port: 3002
 
-### 3. Drizzle Studio (`price-tracker-drizzle-studio`)
+### 3. Drizzle Gateway (`price-tracker-drizzle-gateway`)
 - Database management UI
-- Accessible at `http://localhost:4983` or `http://server-ip:4983`
-- Should be exposed via nginx reverse proxy at `https://studio.khdev.ru`
+- Exposed via nginx reverse proxy at `https://studio.khdev.ru`
+- Internal port: 4983
+
+### 4. Nginx (`price-tracker-nginx`)
+- Reverse proxy with SSL/TLS termination
+- Serves both API and Drizzle Studio
+- Handles SSL certificate validation
+- External ports: 80 (HTTP), 443 (HTTPS)
+
+### 5. Certbot (`price-tracker-certbot`)
+- Manages SSL certificates from Let's Encrypt
+- Automatically renews certificates every 12 hours
+- Runs in the background
 
 ## Domain Configuration
 
@@ -142,114 +162,131 @@ curl https://studio.khdev.ru
 
 ## Nginx Configuration
 
-Nginx must be configured manually on the server to expose the services. The nginx configuration should provide:
+Nginx is automatically configured and deployed as part of the Docker Compose stack. The configuration includes:
 
 1. **HTTP to HTTPS redirect** for both subdomains
-2. **Reverse proxy** to Docker containers (ports 3002 and 4983)
+2. **Reverse proxy** to Docker containers (backend:3002 and drizzle-gateway:4983)
 3. **SSL/TLS termination** with Let's Encrypt certificates
 4. **Security headers** (HSTS, X-Frame-Options, etc.)
 5. **WebSocket support** for Drizzle Studio
 6. **Access and error logging**
+7. **Automatic SSL certificate renewal**
 
-### Example Nginx Configuration
+### Automated SSL Setup
 
-Create a configuration file at `/etc/nginx/sites-available/api.khdev.ru`:
+SSL certificates are automatically obtained and configured during the first deployment. The process:
 
-```nginx
-# Redirect HTTP to HTTPS for API
-server {
-    listen 80;
-    listen [::]:80;
-    server_name api.khdev.ru;
-    
-    location /.well-known/acme-challenge/ {
-        root /var/www/certbot;
-    }
-    
-    location / {
-        return 301 https://$server_name$request_uri;
-    }
-}
+1. Creates dummy self-signed certificates for initial nginx startup
+2. Starts nginx to serve ACME challenges
+3. Requests real SSL certificates from Let's Encrypt
+4. Reloads nginx with the new certificates
+5. Configures automatic renewal every 12 hours
 
-# HTTPS server for API
-server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-    server_name api.khdev.ru;
+### Manual SSL Initialization (Optional)
 
-    ssl_certificate /etc/letsencrypt/live/khdev.ru/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/khdev.ru/privkey.pem;
-
-    location / {
-        proxy_pass http://127.0.0.1:3002;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-
-# HTTPS server for Drizzle Studio
-server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-    server_name studio.khdev.ru;
-
-    ssl_certificate /etc/letsencrypt/live/khdev.ru/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/khdev.ru/privkey.pem;
-
-    location / {
-        proxy_pass http://127.0.0.1:4983;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-    }
-}
-```
-
-### Nginx Setup on Server
-
-To configure nginx manually:
+If you need to initialize SSL certificates separately or the automatic process fails:
 
 ```bash
-# Create the nginx configuration file
-sudo nano /etc/nginx/sites-available/api.khdev.ru
+# SSH into the server
+ssh user@khdev.ru
 
-# Enable the site
-sudo ln -s /etc/nginx/sites-available/api.khdev.ru /etc/nginx/sites-enabled/
+# Navigate to the deployment directory
+cd /var/www/ptracker-api
 
-# Test nginx configuration
-sudo nginx -t
-
-# Reload nginx
-sudo systemctl reload nginx
+# Run the SSL initialization script
+API_DOMAIN=api.khdev.ru \
+STUDIO_DOMAIN=studio.khdev.ru \
+EMAIL=admin@yourdomain.com \
+./scripts/init-ssl.sh
 ```
+
+### Nginx Configuration Files
+
+The nginx configuration is stored in the `nginx/` directory:
+- `nginx/nginx.conf` - Main nginx configuration
+- `nginx/conf.d/api.conf.template` - API reverse proxy configuration
+- `nginx/conf.d/studio.conf.template` - Drizzle Studio reverse proxy configuration
+- `nginx/docker-entrypoint.sh` - Startup script that processes templates
+
+These files are automatically built into the nginx Docker image.
 
 ## SSL Certificates
 
-The nginx configuration assumes SSL certificates are available at:
-- `/etc/letsencrypt/live/khdev.ru/fullchain.pem`
-- `/etc/letsencrypt/live/khdev.ru/privkey.pem`
-- `/etc/letsencrypt/live/khdev.ru/chain.pem`
+SSL certificates are automatically managed by the deployment process using Let's Encrypt and certbot.
 
-If you need to set up SSL certificates:
+### Automatic Certificate Management
+
+The deployment includes:
+- **Initial Certificate Generation**: First deployment automatically obtains SSL certificates
+- **Auto-Renewal**: Certificates are automatically renewed every 12 hours via the certbot container
+- **Certificate Storage**: Certificates are stored in `./certbot/conf/live/`
+- **Zero Downtime**: Certificate renewal happens without service interruption
+
+### Certificate Files Location
+
+Certificates are stored on the server at:
+- `/var/www/ptracker-api/certbot/conf/live/api.khdev.ru/`
+  - `fullchain.pem` - Full certificate chain
+  - `privkey.pem` - Private key
+  - `chain.pem` - Certificate chain
+- `/var/www/ptracker-api/certbot/conf/live/studio.khdev.ru/`
+  - Same structure as above
+
+### Manual Certificate Setup
+
+If you need to manually obtain certificates or the automated process fails:
 
 ```bash
-# Install certbot
-sudo apt-get update
-sudo apt-get install certbot python3-certbot-nginx
+# SSH into the server
+ssh user@khdev.ru
 
-# Obtain certificates for both subdomains
-sudo certbot --nginx -d api.khdev.ru -d studio.khdev.ru
+cd /var/www/ptracker-api
 
-# Auto-renewal is configured by default
-sudo certbot renew --dry-run
+# Use the initialization script
+API_DOMAIN=api.khdev.ru \
+STUDIO_DOMAIN=studio.khdev.ru \
+EMAIL=admin@yourdomain.com \
+./scripts/init-ssl.sh
 ```
+
+### Certificate Renewal
+
+Certificates are automatically renewed by the certbot container. To manually trigger renewal:
+
+```bash
+cd /var/www/ptracker-api
+
+# Trigger manual renewal
+docker-compose exec certbot certbot renew
+
+# Reload nginx to use renewed certificates
+docker-compose exec nginx nginx -s reload
+```
+
+### Troubleshooting SSL
+
+If SSL certificate generation fails:
+
+1. **Check DNS**: Ensure your domains point to the server
+   ```bash
+   nslookup api.khdev.ru
+   nslookup studio.khdev.ru
+   ```
+
+2. **Check Port 80 is Open**: Let's Encrypt requires port 80 for validation
+   ```bash
+   sudo netstat -tulpn | grep :80
+   ```
+
+3. **Check Certbot Logs**:
+   ```bash
+   docker-compose logs certbot
+   ```
+
+4. **Verify Domain Ownership**: Make sure `.well-known/acme-challenge/` is accessible
+   ```bash
+   curl http://api.khdev.ru/.well-known/acme-challenge/test
+   ```
 
 ## Troubleshooting
 

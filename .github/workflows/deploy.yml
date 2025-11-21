@@ -19,6 +19,7 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           DRIZZLE_GATEWAY_MASTERPASS: ${{ secrets.DRIZZLE_GATEWAY_MASTERPASS }}
           SMTP_APP_PASS: ${{ secrets.SMTP_APP_PASS }}
+          SSL_EMAIL: ${{ secrets.SSL_EMAIL }}
         run: |
           error_found=false
           
@@ -49,6 +50,11 @@ jobs:
           
           if [ -z "$DRIZZLE_GATEWAY_MASTERPASS" ]; then
             echo "::error::SECRET 'DRIZZLE_GATEWAY_MASTERPASS' is not configured. Please add it in Settings > Secrets and variables > Actions > Secrets"
+            error_found=true
+          fi
+          
+          if [ -z "$SSL_EMAIL" ]; then
+            echo "::error::SECRET 'SSL_EMAIL' is not configured. Please add it in Settings > Secrets and variables > Actions > Secrets"
             error_found=true
           fi
           
@@ -129,6 +135,9 @@ jobs:
             POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
             DRIZZLE_GATEWAY_MASTERPASS=${{ secrets.DRIZZLE_GATEWAY_MASTERPASS }}
             APP_DOMAIN=${{ vars.APP_DOMAIN || 'http://localhost:3002' }}
+            API_DOMAIN=${{ vars.API_DOMAIN || 'api.khdev.ru' }}
+            STUDIO_DOMAIN=${{ vars.STUDIO_DOMAIN || 'studio.khdev.ru' }}
+            SSL_EMAIL=${{ secrets.SSL_EMAIL }}
             EOF
             
             # Only add SMTP configuration if all required variables are set
@@ -153,6 +162,65 @@ jobs:
           password: ${{ secrets.SERVER_SSH_PASSWORD }}
           script: |
             cd /var/www/ptracker-api
+            
+            # Check if SSL certificates exist
+            if [ ! -d "./certbot/conf/live/${{ vars.API_DOMAIN || 'api.khdev.ru' }}" ]; then
+              echo "SSL certificates not found. Initializing..."
+              
+              # Create certbot directories
+              mkdir -p certbot/conf certbot/www
+              
+              # Create dummy certificates for initial nginx startup
+              mkdir -p certbot/conf/live/${{ vars.API_DOMAIN || 'api.khdev.ru' }}
+              mkdir -p certbot/conf/live/${{ vars.STUDIO_DOMAIN || 'studio.khdev.ru' }}
+              
+              openssl req -x509 -nodes -newkey rsa:2048 -days 1 \
+                -keyout certbot/conf/live/${{ vars.API_DOMAIN || 'api.khdev.ru' }}/privkey.pem \
+                -out certbot/conf/live/${{ vars.API_DOMAIN || 'api.khdev.ru' }}/fullchain.pem \
+                -subj "/CN=${{ vars.API_DOMAIN || 'api.khdev.ru' }}"
+              
+              cp certbot/conf/live/${{ vars.API_DOMAIN || 'api.khdev.ru' }}/fullchain.pem \
+                 certbot/conf/live/${{ vars.API_DOMAIN || 'api.khdev.ru' }}/chain.pem
+              
+              openssl req -x509 -nodes -newkey rsa:2048 -days 1 \
+                -keyout certbot/conf/live/${{ vars.STUDIO_DOMAIN || 'studio.khdev.ru' }}/privkey.pem \
+                -out certbot/conf/live/${{ vars.STUDIO_DOMAIN || 'studio.khdev.ru' }}/fullchain.pem \
+                -subj "/CN=${{ vars.STUDIO_DOMAIN || 'studio.khdev.ru' }}"
+              
+              cp certbot/conf/live/${{ vars.STUDIO_DOMAIN || 'studio.khdev.ru' }}/fullchain.pem \
+                 certbot/conf/live/${{ vars.STUDIO_DOMAIN || 'studio.khdev.ru' }}/chain.pem
+              
+              # Start nginx to serve ACME challenges
+              docker-compose up -d nginx
+              sleep 10
+              
+              # Request real certificates
+              echo "Requesting SSL certificate for ${{ vars.API_DOMAIN || 'api.khdev.ru' }}..."
+              docker-compose run --rm certbot certonly \
+                --webroot \
+                --webroot-path=/var/www/certbot \
+                --email ${{ secrets.SSL_EMAIL }} \
+                --agree-tos \
+                --no-eff-email \
+                --force-renewal \
+                -d ${{ vars.API_DOMAIN || 'api.khdev.ru' }} || echo "⚠️  Failed to obtain SSL certificate for API domain"
+              
+              echo "Requesting SSL certificate for ${{ vars.STUDIO_DOMAIN || 'studio.khdev.ru' }}..."
+              docker-compose run --rm certbot certonly \
+                --webroot \
+                --webroot-path=/var/www/certbot \
+                --email ${{ secrets.SSL_EMAIL }} \
+                --agree-tos \
+                --no-eff-email \
+                --force-renewal \
+                -d ${{ vars.STUDIO_DOMAIN || 'studio.khdev.ru' }} || echo "⚠️  Failed to obtain SSL certificate for Studio domain"
+              
+              echo "✅ SSL certificates initialized"
+            else
+              echo "SSL certificates already exist"
+            fi
+            
+            # Deploy all services
             docker-compose down
             docker-compose up -d --build
             docker-compose ps
