@@ -1,8 +1,5 @@
 FROM nginx:alpine
 
-# Install gettext for envsubst command
-RUN apk add --no-cache gettext
-
 # Copy nginx configuration files
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY conf.d/*.template /etc/nginx/conf.d/
@@ -18,4 +15,5 @@ RUN mkdir -p /var/www/certbot
 EXPOSE 80 443
 
 # Use custom entrypoint
+# Note: envsubst is already included in nginx:alpine base image
 ENTRYPOINT ["/docker-entrypoint.sh"]
