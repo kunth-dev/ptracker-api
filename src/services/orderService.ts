@@ -16,6 +16,28 @@ class ServiceError extends Error {
 }
 
 /**
+ * Helper function to build filter conditions
+ */
+function buildFilterCondition(filterBy?: string, filterValue?: string) {
+  if (!filterBy || !filterValue) {
+    return undefined;
+  }
+
+  switch (filterBy) {
+    case "title":
+      return ilike(orders.title, `%${filterValue}%`);
+    case "status":
+      return eq(orders.status, filterValue);
+    case "link":
+      return ilike(orders.link, `%${filterValue}%`);
+    case "price":
+      return eq(orders.price, filterValue);
+    default:
+      return undefined;
+  }
+}
+
+/**
  * Get orders with pagination, sorting, and filtering
  */
 export async function getOrders(
@@ -32,21 +54,9 @@ export async function getOrders(
   let query = db.select().from(orders);
 
   // Apply filtering if provided
-  if (filterBy && filterValue) {
-    switch (filterBy) {
-      case "title":
-        query = query.where(ilike(orders.title, `%${filterValue}%`)) as typeof query;
-        break;
-      case "status":
-        query = query.where(eq(orders.status, filterValue)) as typeof query;
-        break;
-      case "link":
-        query = query.where(ilike(orders.link, `%${filterValue}%`)) as typeof query;
-        break;
-      case "price":
-        query = query.where(eq(orders.price, filterValue)) as typeof query;
-        break;
-    }
+  const filterCondition = buildFilterCondition(filterBy, filterValue);
+  if (filterCondition) {
+    query = query.where(filterCondition) as typeof query;
   }
 
   // Apply sorting if provided
@@ -75,40 +85,12 @@ export async function getOrders(
   }
 
   // Get total count for pagination
-  const countQuery = db.select({ count: sql<number>`count(*)` }).from(orders);
-  let totalItems = 0;
-
-  // Apply the same filter to count query
-  if (filterBy && filterValue) {
-    let countQueryWithFilter = countQuery;
-    switch (filterBy) {
-      case "title":
-        countQueryWithFilter = countQueryWithFilter.where(
-          ilike(orders.title, `%${filterValue}%`),
-        ) as typeof countQuery;
-        break;
-      case "status":
-        countQueryWithFilter = countQueryWithFilter.where(
-          eq(orders.status, filterValue),
-        ) as typeof countQuery;
-        break;
-      case "link":
-        countQueryWithFilter = countQueryWithFilter.where(
-          ilike(orders.link, `%${filterValue}%`),
-        ) as typeof countQuery;
-        break;
-      case "price":
-        countQueryWithFilter = countQueryWithFilter.where(
-          eq(orders.price, filterValue),
-        ) as typeof countQuery;
-        break;
-    }
-    const [countResult] = await countQueryWithFilter;
-    totalItems = Number(countResult?.count) || 0;
-  } else {
-    const [countResult] = await countQuery;
-    totalItems = Number(countResult?.count) || 0;
+  let countQuery = db.select({ count: sql<number>`count(*)` }).from(orders);
+  if (filterCondition) {
+    countQuery = countQuery.where(filterCondition) as typeof countQuery;
   }
+  const [countResult] = await countQuery;
+  const totalItems = Number(countResult?.count) || 0;
 
   // Apply pagination
   const ordersResult = await query.limit(itemsPerPage).offset(offset);
